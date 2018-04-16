@@ -13,7 +13,7 @@ RUN apt-get update &&\
     apt-get install -y libxrender-dev libgl1-mesa-dev &&\
     apt-get clean -y &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* &&\
-    mv models/CACO2/dev/minicaco.sdf _minicaco.sdf &&\
+    mv ../mols/minicaco.sdf _minicaco.sdf &&\
     python flame.py -c build -e CACO2 -f _minicaco.sdf &&\
     rm _minicaco.sdf 
 
