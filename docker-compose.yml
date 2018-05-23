@@ -1,0 +1,31 @@
+version: '3.5'
+
+services:
+
+  padel:
+    image: dockerhub.etransafe.eu:5000/upf_padel
+    volumes:
+      - data-volume:/opt/data
+    networks: 
+      - overlay
+    tty: true
+
+    
+  flame:
+    build:
+      context: .
+    image: dockerhub.etransafe.eu:5000/upf_flame
+    volumes:
+      - data-volume:/opt/data
+    ports:
+      - "8080:8080"
+    networks: 
+      - overlay
+    stdin_open: true
+    tty: true
+
+volumes:
+  data-volume:
+
+networks:
+  overlay:

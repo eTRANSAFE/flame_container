@@ -8,20 +8,29 @@ LABEL website="https://github.com/phi-grib/flame"
 
 MAINTAINER Biel Stela <biel.stela@upf.edu>
 
+ENV USER=phi-grib
+ENV REPO=flame
+ENV BRANCH=padel_request
+
 WORKDIR /opt
-
-RUN git clone -b padel_request --single-branch https://github.com/phi-grib/flame &&\
-    cd flame && \
-    conda env create -f environment.yml
-ENV PATH /opt/conda/envs/flame/bin:$PATH
-
-WORKDIR /opt/flame/flame
 
 RUN apt-get update &&\
     apt-get install -y libxrender-dev libgl1-mesa-dev &&\
     apt-get clean -y &&\
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* &&\
-    mv ../mols/minicaco.sdf _minicaco.sdf &&\
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# hack to don't use cache if repo haves new commits
+ADD https://api.github.com/repos/$USER/$REPO/git/refs/heads/$BRANCH version.json
+RUN git clone -b $BRANCH --single-branch https://github.com/$USER/$REPO.git &&\
+    cd flame && \
+    conda env create -f environment.yml
+    
+# hand activate conda environment    
+ENV PATH /opt/conda/envs/flame/bin:$PATH
+
+WORKDIR /opt/flame/flame
+
+RUN mv ../mols/minicaco.sdf _minicaco.sdf &&\
     python flame.py -c build -e CACO2 -f _minicaco.sdf &&\
     rm _minicaco.sdf 
 
