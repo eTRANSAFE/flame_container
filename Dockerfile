@@ -24,15 +24,11 @@ ADD https://api.github.com/repos/$USER/$REPO/git/refs/heads/$BRANCH version.json
 RUN git clone -b $BRANCH --single-branch https://github.com/$USER/$REPO.git &&\
     cd flame && \
     conda env create -f environment.yml
-    
+
 # hand activate conda environment    
 ENV PATH /opt/conda/envs/flame/bin:$PATH
 
 WORKDIR /opt/flame/flame
-
-RUN mv ../mols/minicaco.sdf _minicaco.sdf &&\
-    python flame.py -c build -e CACO2 -f _minicaco.sdf &&\
-    rm _minicaco.sdf 
 
 EXPOSE 8080
 
