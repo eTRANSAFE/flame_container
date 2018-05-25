@@ -19,14 +19,18 @@ RUN apt-get update &&\
     apt-get clean -y &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# hack to don't use cache if repo haves new commits
-ADD https://api.github.com/repos/$USER/$REPO/git/refs/heads/$BRANCH version.json
 RUN git clone -b $BRANCH --single-branch https://github.com/$USER/$REPO.git &&\
     cd flame && \
     conda env create -f environment.yml
 
 # hand activate conda environment    
 ENV PATH /opt/conda/envs/flame/bin:$PATH
+
+# hack to don't use cache if repo haves new commits
+ADD https://api.github.com/repos/$USER/$REPO/git/refs/heads/$BRANCH version.json
+RUN cd flame && \
+    git pull https://github.com/$USER/$REPO.git
+
 
 WORKDIR /opt/flame/flame
 
