@@ -17,6 +17,7 @@ services:
     image: dockerhub.etransafe.eu:5000/upf_flame
     volumes:
       - data-volume:/opt/data
+      - models-volume:/opt/models
     ports:
       - "8080:8080"
     networks: 
@@ -26,6 +27,7 @@ services:
 
 volumes:
   data-volume:
-
+  models-volume:
+  
 networks:
   overlay:

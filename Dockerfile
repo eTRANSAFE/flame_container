@@ -30,6 +30,8 @@ ENV PATH /opt/conda/envs/flame/bin:$PATH
 
 WORKDIR /opt/flame/flame
 
+RUN cp -R models/ /opt/
+
 EXPOSE 8080
 
 ENTRYPOINT [ "python", "predict-ws.py" ]
