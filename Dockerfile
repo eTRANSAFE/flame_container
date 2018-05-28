@@ -19,6 +19,9 @@ RUN apt-get update &&\
     apt-get clean -y &&\
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# cloning flame repo. First clone to get access to the environment.yml
+# then pull with commit changes awareness to rebuild from the next layer
+# and avoid instaling al the libraries every build.  
 RUN git clone -b $BRANCH --single-branch https://github.com/$USER/$REPO.git &&\
     cd flame && \
     conda env create -f environment.yml
