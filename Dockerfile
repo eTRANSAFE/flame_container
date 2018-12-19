@@ -2,7 +2,7 @@ FROM continuumio/miniconda3
 
 LABEL base.image="continuumio/miniconda3"
 LABEL software="flame"
-LABEL software.version=" v0.0.1-dev"
+LABEL software.version=" v0.1-alpha"
 LABEL description="Python scripts to build and manage QSAR models. Predictive modeling within the eTRANSAFE (http://etransafe.eu) project."
 LABEL website="https://github.com/phi-grib/flame"
 
@@ -11,6 +11,9 @@ MAINTAINER Biel Stela <biel.stela@upf.edu>
 ENV USER=phi-grib
 ENV REPO=flame
 ENV BRANCH=padel_request
+
+ENV WSBRANCH=docker
+ENV WSREPO=flame_ws
 
 WORKDIR /opt
 
@@ -30,16 +33,24 @@ RUN git clone -b $BRANCH --single-branch https://github.com/$USER/$REPO.git &&\
 # hand activate conda environment    
 ENV PATH /opt/conda/envs/flame/bin:$PATH
 
+ADD https://api.github.com/repos/$USER/$WSREPO/git/refs/heads/master version.json
+RUN cd flame/ &&\
+    pip install . &&\
+    cd /opt &&\
+    git clone -b $WSBRANCH --single-branch https://github.com/$USER/$WSREPO.git
 # hack to don't use cache if repo haves new commits
 # ADD https://api.github.com/repos/$USER/$REPO/git/refs/heads/$BRANCH version.json
 # RUN cd flame && \
 #     git pull https://github.com/$USER/$REPO.git
 
 
-WORKDIR /opt/flame/flame
+WORKDIR /opt/flame_ws/flame_ws
 
-RUN cp -R models/ /opt/
+RUN cp -R /opt/flame/flame/models/ /opt/ &&\
+    flame -c config -p /opt/models/
 
-EXPOSE 8080
+COPY BSEP_model /opt/models/BSEP_model
 
-ENTRYPOINT [ "python", "predict-ws.py" ]
+EXPOSE 8081
+
+ENTRYPOINT [ "python", "flame-ws.py" ]
