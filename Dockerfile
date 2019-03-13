@@ -2,21 +2,21 @@ FROM continuumio/miniconda3
 
 LABEL base.image="continuumio/miniconda3"
 LABEL software="flame"
-LABEL software.version=" v0.1-alpha"
-LABEL description="Python scripts to build and manage QSAR models. Predictive modeling within the eTRANSAFE (http://etransafe.eu) project."
+LABEL software.version=" v0.1"
+LABEL description="Modeling framework to build and manage QSAR models. Predictive modeling within the eTRANSAFE (http://etransafe.eu) project."
 LABEL website="https://github.com/phi-grib/flame"
+LABEL author="Biel Stela <biel.stela@upf.edu>"
 
-MAINTAINER Biel Stela <biel.stela@upf.edu>
-
+# env vars
 ENV USER=phi-grib
 ENV REPO=flame
 ENV BRANCH=padel_request
-
 ENV WSBRANCH=docker
 ENV WSREPO=flame_ws
 
 WORKDIR /opt
 
+# install dependencies for graphics needed in matplotlib and other python dependencies
 RUN apt-get update &&\
     apt-get install -y libxrender-dev libgl1-mesa-dev &&\
     apt-get clean -y &&\
@@ -24,13 +24,13 @@ RUN apt-get update &&\
 
 # cloning flame repo. First clone to get access to the environment.yml
 # then pull with commit changes awareness to rebuild from the next layer
-# and avoid instaling al the libraries every build.
+# and avoid instaling all the libraries every build.
 ADD https://api.github.com/repos/$USER/$REPO/git/refs/heads/$BRANCH version.json
 RUN git clone -b $BRANCH --single-branch https://github.com/$USER/$REPO.git &&\
     cd flame && \
     conda env create -f environment.yml
 
-# hand activate conda environment    
+# hand activate conda environment
 ENV PATH /opt/conda/envs/flame/bin:$PATH
 
 ADD https://api.github.com/repos/$USER/$WSREPO/git/refs/heads/master version.json
